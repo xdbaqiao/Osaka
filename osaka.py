@@ -4,6 +4,7 @@
 from __future__ import division
 
 import time
+from datetime import datetime
 from selector import select
 from trader import trader
 from download import download
@@ -60,7 +61,10 @@ class osaka:
 if __name__ == '__main__':
     scs = osaka()
     while True:
-        if scs.quit:
+        today = datetime.today()
+        if scs.quit or today.hour>=10:
+            # 超过十点就退出
             break
+        # 隔1秒刷新
         time.sleep(1)
         scs.adjust()
