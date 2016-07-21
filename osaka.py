@@ -13,7 +13,7 @@ from common import get_stock_prefix, get_osaka_stocks
 SRC = 'http://qt.gtimg.cn/q=%s'
 
 class osaka:
-    def __init__(self, use_pool=False):
+    def __init__(self, use_pool=True):
         self.quit = False
         self.trader = trader()
         self.stocks_pool = self.stocks_pool_creator() if use_pool else []
@@ -36,7 +36,7 @@ class osaka:
         osaka_stocks = sorted(bag.values(), key=lambda x:x['five_min'], reverse=True)
         # 五分钟排名前五
         for stock in osaka_stocks[:5]:
-            if float(stock['change_rat']) >= 9 and float(stock['five_min']) >= 3.5:
+            if float(stock['change_rat']) >= 9 and float(stock['five_min']) >= 1.5:
                 if self.stocks_pool and stock['stock_code'] in self.stocks_pool:
                     return stock['stock_code']
                 if not self.stocks_pool:
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     scs = osaka()
     while True:
         today = datetime.today()
-        if scs.quit or today.hour>=10:
+        if scs.quit or today.hour>=11:
             # 超过十点就退出
             break
         # 隔1秒刷新

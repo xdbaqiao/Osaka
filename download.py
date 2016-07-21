@@ -13,7 +13,7 @@ class download:
         socket.setdefaulttimeout(20)
 
     def get(self, url):
-        print '%s Downloading: %s' % (time.strftime('%Y-%m-%d %H:%m:%S'), url)
+        print '%s Downloading: %s' % (time.strftime('%Y-%m-%d %H:%M:%S'), url)
         request = urllib2.Request(url)
         response = self.opener.open(request)
         html = response.read()
