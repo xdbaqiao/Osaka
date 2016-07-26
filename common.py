@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 # coding: utf-8
 
+from __future__ import division
+
 import re
 import requests
 from download import download
@@ -65,7 +67,33 @@ def get_osaka_stocks():
             result[infos[1]] = bag
     return result
 
+def get_finance_numeric():
+    # 获取概念板块资金流向数据
+    # 单位成交量主力流入占比
+    url = 'http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?cmd=C._BKGN&type=ct&st=(BalFlowMain)&sr=-1&p=1&ps=50&js=[(x)]&token=894050c76af8597a853f5b408b759f5d&sty=DCFFITABK'
+    html = download().get(url)
+    bag_bk = {}
+    for inum, i in enumerate(re.compile(r'"([^"]+)"').findall(html)):
+        m = i.split(',')
+        bkid = m[1] if len(m)>1 else ''
+        if bkid not in bag_bk:
+            bag_bk[bkid] = {}
+        money_in = float(m[4])*10000 if len(m) >4 else ''
+        surl = 'http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=C.%s1&sty=FCOIATA&sortType=C&sortRule=-1&page=1&pageSize=100&js=[(x)]&token=7bc05d0d4c3c22ef9fca8c2a912d779c&jsName=quote_123' % bkid if bkid else ''
+        if surl:
+            shtml = download().get(surl)
+            infos = re.compile(r'"([^"]+)"').findall(shtml)
+            amt_all = sum([float(j.split(',')[8]) for j in infos if j.split(',')[8] != '-'])
+            # 大单占板块成交量的占比
+            bag_bk[bkid]['bkid'] = bkid
+            bag_bk[bkid]['bkname'] = m[2]
+            bag_bk[bkid]['avg_in'] = 100*money_in / amt_all
+            bag_bk[bkid]['stocks_all'] = ';'.join([j.split(',')[1] for j in infos])
+        if inum > 20:
+            break
+    return bag_bk
 
 if __name__ == '__main__':
-    five_ups = get_osaka_stocks()
-    print sorted(five_ups.values(), key=lambda x:x['five_min'], reverse=True)
+    bag = get_finance_numeric()
+    for i in sorted(bag.values(), key=lambda x:x['avg_in'], reverse=True):
+        print i['bkname'], i['avg_in']
