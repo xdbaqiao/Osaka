@@ -8,7 +8,7 @@ from datetime import datetime
 from selector import select
 from trader import trader
 from download import download
-from common import get_stock_prefix, get_osaka_stocks 
+from common import get_osaka_stocks, get_finance_numeric, get_finance_top
 
 SRC = 'http://qt.gtimg.cn/q=%s'
 
@@ -16,10 +16,16 @@ class osaka:
     def __init__(self, use_pool=True):
         self.quit = False
         self.trader = trader()
-        self.stocks_pool = self.stocks_pool_creator() if use_pool else []
+        self.use_pool = use_pool
 
     def stocks_pool_creator(self):
-        return [i.strip() for i in open('stocks_pool.csv')]
+        rat_bag = get_finance_numeric()
+        avg_top = sorted(rat_bag.values(), key=lambda x:x['avg_in'], reverse=True)
+        finance_top = get_finance_top()
+        results = []
+        for k in [i for i in avg_top if i['bkid'] in finance_top]:
+            results += k['stocks_all'].split(';')
+        return results
 
     def adjust(self):
         bag = get_osaka_stocks()
@@ -34,12 +40,14 @@ class osaka:
 
     def target_stock_decision(self, bag):
         osaka_stocks = sorted(bag.values(), key=lambda x:x['five_min'], reverse=True)
+        # 热门板块股票池
+        stocks_pool = self.stocks_pool_creator() if self.use_pool else []
         # 五分钟排名前五
         for stock in osaka_stocks[:5]:
             if float(stock['change_rat']) >= 9 and float(stock['five_min']) >= 1.5:
-                if self.stocks_pool and stock['stock_code'] in self.stocks_pool:
+                if stocks_pool and stock['stock_code'] in stocks_pool:
                     return stock['stock_code']
-                if not self.stocks_pool:
+                if not stocks_pool:
                     return stock['stock_code']
 
     def sell_out(self, stocks):

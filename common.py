@@ -93,7 +93,23 @@ def get_finance_numeric():
             break
     return bag_bk
 
+def get_finance_top(n=20):
+    # 获取概念板块涨幅前20
+    url = 'http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?cmd=C._BKGN&type=ct&st=(ChangePercent)&sr=-1&p=1&ps=%s&js=[(x)]&token=894050c76af8597a853f5b408b759f5d&sty=DCFFITABK&rt=48985977' % str(n)
+    html = download().get(url)
+    result = []
+    for inum, i in enumerate(re.compile(r'"([^"]+)"').findall(html)):
+        m = i.split(',')
+        bkid = m[1] if len(m)>1 else ''
+        if bkid not in result:
+            result.append(bkid)
+    return result
+
 if __name__ == '__main__':
-    bag = get_finance_numeric()
-    for i in sorted(bag.values(), key=lambda x:x['avg_in'], reverse=True):
-        print i['bkname'], i['avg_in']
+    rat_bag = get_finance_numeric()
+    avg_top = sorted(rat_bag.values(), key=lambda x:x['avg_in'], reverse=True)
+    finance_top = get_finance_top()
+    results = []
+    for k in [i for i in avg_top if i['bkid'] in finance_top]:
+        results += k['stocks_all'].split(';')
+    print results
