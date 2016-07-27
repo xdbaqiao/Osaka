@@ -15,6 +15,10 @@ class download:
     def get(self, url):
         print '%s Downloading: %s' % (time.strftime('%Y-%m-%d %H:%M:%S'), url)
         request = urllib2.Request(url)
-        response = self.opener.open(request)
+        try:
+            response = self.opener.open(request)
+        except Exception:
+            print 'Warning: timeout %s' % url
+            return ''
         html = response.read()
         return html

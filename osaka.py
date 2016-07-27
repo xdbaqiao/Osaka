@@ -24,6 +24,7 @@ class osaka:
         finance_top = get_finance_top()
         results = []
         for k in [i for i in avg_top if i['bkid'] in finance_top]:
+            print 'Hot stocks: %s' % k['bkname']
             results += k['stocks_all'].split(';')
         return results
 
