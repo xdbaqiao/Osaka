@@ -82,6 +82,8 @@ def get_finance_numeric():
         surl = 'http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=C.%s1&sty=FCOIATA&sortType=C&sortRule=-1&page=1&pageSize=100&js=[(x)]&token=7bc05d0d4c3c22ef9fca8c2a912d779c&jsName=quote_123' % bkid if bkid else ''
         if surl:
             shtml = download().get(surl)
+            if not shtml:
+                continue
             infos = re.compile(r'"([^"]+)"').findall(shtml)
             amt_all = sum([float(j.split(',')[8]) for j in infos if j.split(',')[8] != '-'])
             # 大单占板块成交量的占比
