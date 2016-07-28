@@ -74,8 +74,8 @@ if __name__ == '__main__':
     scs = osaka()
     while True:
         today = datetime.today()
-        if scs.quit or today.hour>=11:
-            # 超过十点就退出
+        if scs.quit or (today.hour>=10 and today.minute>=15):
+            # 超过十点十五就退出
             break
         # 隔1秒刷新
         time.sleep(1)
