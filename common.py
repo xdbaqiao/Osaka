@@ -63,6 +63,7 @@ def get_osaka_stocks():
         bag['volume'] = infos[7]
         bag['turnover'] = infos[8]
         bag['five_min'] = infos[22]
+        bag['high_price'] = infos[11]
         if infos[1] not in result and infos[3] != infos[11]:
             result[infos[1]] = bag
     return result

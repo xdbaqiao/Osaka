@@ -48,7 +48,7 @@ class osaka:
         # 五分钟排名前五
         for stock in osaka_stocks[:5]:
             if float(stock['change_rat']) >= 9 and float(stock['five_min']) >= 2.5 \
-                    and Decimal(stock['high_price']) <= Decimal(stock['now_price']):
+                    and Decimal(stock['high_price']) <= Decimal(stock['current_price']):
                 if stocks_pool and stock['stock_code'] in stocks_pool:
                     return stock['stock_code']
                 if not stocks_pool:
