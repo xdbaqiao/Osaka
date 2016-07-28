@@ -91,6 +91,8 @@ def get_finance_numeric():
             bag_bk[bkid]['bkname'] = m[2]
             bag_bk[bkid]['avg_in'] = 100*money_in / amt_all
             bag_bk[bkid]['stocks_all'] = ';'.join([j.split(',')[1] for j in infos])
+            bag_bk[bkid]['high_price'] = m[11]
+            bag_bk[bkid]['now_price'] = m[3]
         if inum > 20:
             break
     return bag_bk

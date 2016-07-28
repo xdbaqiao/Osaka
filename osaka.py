@@ -4,6 +4,7 @@
 from __future__ import division
 
 import time
+from decimal import Decimal
 from datetime import datetime
 from selector import select
 from trader import trader
@@ -20,10 +21,10 @@ class osaka:
 
     def stocks_pool_creator(self):
         rat_bag = get_finance_numeric()
-        avg_top = sorted(rat_bag.values(), key=lambda x:x['avg_in'], reverse=True)
+        avg_top = sorted(rat_bag.values(), key=lambda x:x.get('avg_in'), reverse=True)
         finance_top = get_finance_top()
         results = []
-        for k in [i for i in avg_top if i['bkid'] in finance_top]:
+        for k in [i for i in avg_top if i.get('bkid') in finance_top]:
             print 'Hot stocks: %s' % k['bkname']
             results += k['stocks_all'].split(';')
         return results
@@ -35,6 +36,7 @@ class osaka:
         # 清仓 
         if len(holding_stocks)==2:
             self.sell_out(holding_stocks)
+            self.trader = trader()
         # 开仓
         if target_stock:
             self.buy_in(target_stock)
@@ -45,7 +47,8 @@ class osaka:
         stocks_pool = self.stocks_pool_creator() if self.use_pool else []
         # 五分钟排名前五
         for stock in osaka_stocks[:5]:
-            if float(stock['change_rat']) >= 9 and float(stock['five_min']) >= 1.5:
+            if float(stock['change_rat']) >= 9 and float(stock['five_min']) >= 2.5 \
+                    and Decimal(stock['high_price']) <= Decimal(stock['now_price']):
                 if stocks_pool and stock['stock_code'] in stocks_pool:
                     return stock['stock_code']
                 if not stocks_pool:
